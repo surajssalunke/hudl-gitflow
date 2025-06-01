@@ -8,7 +8,9 @@ import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js"
 import readline from "readline/promises";
 import dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config({
+  path: "../.env",
+});
 
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 if (!ANTHROPIC_API_KEY) {
@@ -24,6 +26,7 @@ class MCPClient {
   private anthropic: Anthropic;
   private transport: StdioClientTransport | null = null;
   private tools: Tool[] = [];
+  private messages: MessageParam[] = [];
 
   constructor() {
     this.anthropic = new Anthropic({
@@ -69,17 +72,15 @@ class MCPClient {
   }
 
   async processQuery(query: string) {
-    const messages: MessageParam[] = [
-      {
-        role: "user",
-        content: query,
-      },
-    ];
+    this.messages.push({
+      role: "user",
+      content: query,
+    });
 
     const response = await this.anthropic.messages.create({
       model: "claude-3-5-sonnet-20241022",
       max_tokens: 1000,
-      messages,
+      messages: this.messages,
       tools: this.tools,
     });
 
@@ -102,7 +103,7 @@ class MCPClient {
           `[Calling tool ${toolName} with args ${JSON.stringify(toolArgs)}]`
         );
 
-        messages.push({
+        this.messages.push({
           role: "user",
           content: result.content as string,
         });
@@ -110,7 +111,7 @@ class MCPClient {
         const response = await this.anthropic.messages.create({
           model: "claude-3-5-sonnet-20241022",
           max_tokens: 1000,
-          messages,
+          messages: this.messages,
         });
 
         finalText.push(
