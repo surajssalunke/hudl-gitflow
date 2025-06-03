@@ -1,20 +1,16 @@
 import axios from "axios";
 import { Request, Response } from "express";
+import { Octokit } from "octokit";
+
 import { githubConfig } from "../config/github";
 
 const { clientId, clientSecret, callbackUrl } = githubConfig;
 
-/**
- * Step 1: Redirect user to GitHub for authentication
- */
 export const loginWithGitHub = (_: Request, res: Response) => {
   const redirectUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${callbackUrl}&scope=read:org,repo`;
   res.redirect(redirectUrl);
 };
 
-/**
- * Step 2: GitHub redirects back with `code`. We exchange it for an access token.
- */
 export const githubCallback = async (
   req: Request,
   res: Response
@@ -47,7 +43,6 @@ export const githubCallback = async (
       return;
     }
 
-    // Fetch authenticated user info
     const userRes = await axios.get(`https://api.github.com/user`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -56,15 +51,13 @@ export const githubCallback = async (
     });
 
     const user = userRes.data;
-
-    // You can also store the accessToken in a DB/session/etc
-    // For now, just return it with basic user info
-    res.json({
-      username: user.login,
-      avatar_url: user.avatar_url,
-      name: user.name,
-      token: accessToken, // Don't send this to frontend in real apps without precautions
-    });
+    res.redirect(
+      `http://localhost:5173/login?username=${
+        user.login
+      }&avatar_url=${encodeURIComponent(
+        user.avatar_url
+      )}&name=${encodeURIComponent(user.name)}`
+    );
   } catch (err: any) {
     console.error("GitHub auth failed:", err.response?.data || err.message);
     res.status(500).json({ error: "GitHub authentication failed" });
