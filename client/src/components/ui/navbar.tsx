@@ -19,7 +19,7 @@ export function Navbar({
         <Tabs value={activeTab} onValueChange={setActiveTab} className="ml-2">
           <TabsList>
             <TabsTrigger value="insights">Insights</TabsTrigger>
-            <TabsTrigger value="ai-agent">AI Agent</TabsTrigger>
+            <TabsTrigger value="ai-assistant">AI Assistant</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
