@@ -15,7 +15,7 @@ export const resolveSquad = (
   res: Response,
   next: NextFunction
 ) => {
-  const { githubUsername } = req.body;
+  const githubUsername = req.header("x-github-username");
 
   if (!githubUsername || typeof githubUsername !== "string") {
     res.status(400).json({ error: "githubUsername is required" });

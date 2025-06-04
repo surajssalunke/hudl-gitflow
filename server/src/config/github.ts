@@ -6,3 +6,8 @@ export const githubConfig = {
   apiBaseUrl: "https://api.github.com",
   githubToken: process.env.GITHUB_PERSONAL_ACCESS_TOKEN!,
 };
+
+export const anthropicConfig = {
+  apiKey: process.env.ANTHROPIC_API_KEY!,
+  model: "claude-3-5-sonnet-latest",
+};

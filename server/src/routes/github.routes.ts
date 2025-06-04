@@ -1,9 +1,17 @@
 import express from "express";
-import { getPrCycleTimes } from "../controllers/github.controller";
+import {
+  getPrCycleTimesAndThroughput,
+  getSquad,
+} from "../controllers/github.controller";
 import { resolveSquad } from "../middleware/resolveSquad";
 
 const router = express.Router();
 
-router.post("/squad", resolveSquad, getPrCycleTimes);
+router.get("/squad", resolveSquad, getSquad);
+router.post(
+  "/squad/pr-cycle-and-throughput",
+  resolveSquad,
+  getPrCycleTimesAndThroughput
+);
 
 export default router;

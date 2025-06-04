@@ -2,13 +2,12 @@ import type { PRCycleTime } from "@/types/insights";
 
 export function computeClosePRStats(
   prs: PRCycleTime[],
-  startKey: keyof PRCycleTime,
-  endKeyFn: (pr: PRCycleTime) => keyof PRCycleTime
+  startKey: "createdAt" | "firstCommitAt" | "firstReviewAt" | "lastCommitAt",
+  endKey: "closedAt" | "mergedAt"
 ) {
   const durations = prs
     .map((pr) => {
       const start = pr[startKey];
-      const endKey: keyof PRCycleTime = endKeyFn(pr);
       const end = pr[endKey];
       if (!start || !end) return null;
       return new Date(end).getTime() - new Date(start).getTime();
@@ -22,14 +21,18 @@ export function computeClosePRStats(
   const p50 = durations[Math.floor(durations.length * 0.5)];
   const p90 = durations[Math.floor(durations.length * 0.9)];
 
-  const toHrs = (ms: number): number => +(ms / (1000 * 60 * 60)).toFixed(2);
-  return { avg: toHrs(avg), p50: toHrs(p50), p90: toHrs(p90) };
+  const toDays = (ms: number): number =>
+    +(ms / (1000 * 60 * 60 * 24)).toFixed(2);
+  return { avg: toDays(avg), p50: toDays(p50), p90: toDays(p90) };
 }
 
-export function computeCloseStats(prs: PRCycleTime[]) {
+export function computeOpenPRStats(
+  prs: PRCycleTime[],
+  startKey: keyof PRCycleTime
+) {
   const durations = prs
     .map((pr) => {
-      const start = pr["createdAt"];
+      const start = pr[startKey];
       if (!start) return null;
       return new Date().getTime() - new Date(start).getTime();
     })
@@ -42,6 +45,22 @@ export function computeCloseStats(prs: PRCycleTime[]) {
   const p50 = durations[Math.floor(durations.length * 0.5)];
   const p90 = durations[Math.floor(durations.length * 0.9)];
 
-  const toHrs = (ms: number): number => +(ms / (1000 * 60 * 60)).toFixed(2);
-  return { avg: toHrs(avg), p50: toHrs(p50), p90: toHrs(p90) };
+  const toDays = (ms: number): number =>
+    +(ms / (1000 * 60 * 60 * 24)).toFixed(2);
+  return { avg: toDays(avg), p50: toDays(p50), p90: toDays(p90) };
 }
+
+export const getAvgDays = (prs: PRCycleTime[]) => {
+  const durations = prs.map((pr) => {
+    const start = new Date(pr.firstCommitAt || pr.createdAt);
+    const end = new Date(
+      pr.closedAt || pr.mergedAt || new Date().toISOString()
+    );
+    return (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24);
+  });
+  return durations.length
+    ? Number(
+        +(durations.reduce((a, b) => a + b, 0) / durations.length).toFixed(2)
+      )
+    : 0;
+};

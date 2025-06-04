@@ -1,210 +1,24 @@
 import { Response } from "express";
-// import axios from "axios";
-// import { githubConfig } from "../config/github";
 import { SquadRequest } from "../middleware/resolveSquad";
 import { getCycleTimeForSquadRepos, getOctokit } from "../helpers/github";
+import Anthropic from "@anthropic-ai/sdk";
+import { anthropicConfig } from "../config/github";
 
-interface Squad {
-  repos: string[];
-  members: string[];
+const client = new Anthropic({
+  apiKey: anthropicConfig.apiKey,
+});
+
+export async function getSquad(req: SquadRequest, res: Response) {
+  res
+    .status(200)
+    .json({ squad: req.squad, members: req.members, repos: req.repos });
+  return;
 }
-interface SquadsConfig {
-  [squadName: string]: Squad;
-}
 
-// function getDateRange(period?: string) {
-//   const now = new Date();
-//   let from: Date;
-//   if (period === "month") {
-//     from = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-//   } else if (period === "week") {
-//     from = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-//   } else {
-//     from = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
-//   }
-//   return { from: from.toISOString(), to: now.toISOString() };
-// }
-
-// export const getSquadInsights = async (req: SquadRequest, res: Response) => {
-//   const { period } = req.body as {
-//     period?: string;
-//   };
-
-//   if (!req.squad) {
-//     res.status(404).json({ error: "User not found in any squad" });
-//     return;
-//   }
-
-//   const { from, to } = getDateRange(period);
-
-//   const githubToken = githubConfig.githubToken;
-//   if (!githubToken) {
-//     res.status(500).json({ error: "GitHub token not configured" });
-//     return;
-//   }
-
-//   async function fetchRepoInsights(repo: string): Promise<{
-//     repo: string;
-//     prMergeTimes: number[];
-//     prCount: number;
-//     commitCount: number;
-//     prMergesByDay: { [date: string]: number };
-//     commitsByDay: { [date: string]: number };
-//     commitsPerUser: { [username: string]: number };
-//   }> {
-//     // Fetch PRs merged in period
-//     const prsRes = await axios.get(
-//       `https://api.github.com/repos/surajssalunke/${repo}/pulls`,
-//       {
-//         headers: { Authorization: `Bearer ${githubToken}` },
-//         params: {
-//           state: "closed",
-//           per_page: 100,
-//           sort: "updated",
-//           direction: "desc",
-//         },
-//       }
-//     );
-
-//     const prs = (prsRes.data as any[]).filter(
-//       (pr) =>
-//         pr.merged_at &&
-//         pr.merged_at >= from &&
-//         pr.merged_at <= to &&
-//         req.members!.includes(pr.user.login)
-//     );
-//     // Calculate merge times
-//     const prMergeTimes = prs.map((pr) => {
-//       const created = new Date(pr.created_at).getTime();
-//       const merged = new Date(pr.merged_at).getTime();
-//       return (merged - created) / (1000 * 60 * 60); // hours
-//     });
-//     // Group PR merges by day
-//     const prMergesByDay = groupByDay(
-//       prs.map((pr) => ({ date: pr.merged_at })),
-//       from,
-//       to
-//     );
-
-//     // Fetch commits in period
-//     const commitsRes = await axios.get(
-//       `https://api.github.com/repos/surajssalunke/${repo}/commits`,
-//       {
-//         headers: { Authorization: `Bearer ${githubToken}` },
-//         params: {
-//           since: from,
-//           until: to,
-//           per_page: 100,
-//         },
-//       }
-//     );
-//     const commits = (commitsRes.data as any[]).filter(
-//       (c) =>
-//         (c.commit &&
-//           c.commit.author &&
-//           req.members!.includes(c.commit.author.name)) ||
-//         (c.author && req.members!.includes(c.author.login))
-//     );
-//     // Group commits by day
-//     const commitsByDay = groupByDay(
-//       commits.map((c) => ({ date: c.commit.author.date })),
-//       from,
-//       to
-//     );
-//     // Group commits by user
-//     const commitsPerUser: { [username: string]: number } = {};
-//     commits.forEach((c) => {
-//       let username =
-//         c.author && c.author.login
-//           ? c.author.login
-//           : c.commit && c.commit.author && c.commit.author.name
-//           ? c.commit.author.name
-//           : undefined;
-//       if (username && req.members!.includes(username)) {
-//         commitsPerUser[username] = (commitsPerUser[username] || 0) + 1;
-//       }
-//     });
-
-//     return {
-//       repo,
-//       prMergeTimes,
-//       prCount: prs.length,
-//       commitCount: commits.length,
-//       prMergesByDay,
-//       commitsByDay,
-//       commitsPerUser,
-//     };
-//   }
-
-//   // Helper to group data by day
-//   function groupByDay(items: { date: string }[], from: string, to: string) {
-//     const result: { [date: string]: number } = {};
-//     const start = new Date(from);
-//     const end = new Date(to);
-//     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-//       const key = d.toISOString().slice(0, 10);
-//       result[key] = 0;
-//     }
-//     items.forEach((item) => {
-//       const key = item.date.slice(0, 10);
-//       if (result[key] !== undefined) result[key]++;
-//     });
-//     return result;
-//   }
-
-//   try {
-//     const insights = await Promise.all(req.repos!.map(fetchRepoInsights));
-//     // Aggregate
-//     const allMergeTimes: number[] = insights.flatMap((i) => i.prMergeTimes);
-//     const avgMergeTime =
-//       allMergeTimes.length > 0
-//         ? allMergeTimes.reduce((a, b) => a + b, 0) / allMergeTimes.length
-//         : null;
-//     const totalPRs = insights.reduce((sum, i) => sum + i.prCount, 0);
-//     const totalCommits = insights.reduce((sum, i) => sum + i.commitCount, 0);
-
-//     // Squad-level time series
-//     const squadPRsByDay: { [date: string]: number } = {};
-//     const squadCommitsByDay: { [date: string]: number } = {};
-//     if (insights.length > 0) {
-//       const days = Object.keys(insights[0].prMergesByDay);
-//       days.forEach((day) => {
-//         squadPRsByDay[day] = insights.reduce(
-//           (sum, i) => sum + (i.prMergesByDay[day] || 0),
-//           0
-//         );
-//         squadCommitsByDay[day] = insights.reduce(
-//           (sum, i) => sum + (i.commitsByDay[day] || 0),
-//           0
-//         );
-//       });
-//     }
-
-//     res.status(200).json({
-//       squad: req.squad,
-//       period: { from, to },
-//       avgMergeTimeHours: avgMergeTime,
-//       totalPRs,
-//       totalCommits,
-//       squadPRsByDay,
-//       squadCommitsByDay,
-//       repoBreakdown: insights,
-//       // Aggregate commits per user across all repos
-//       commitsPerUser: insights.reduce((acc, repo) => {
-//         Object.entries(repo.commitsPerUser).forEach(([user, count]) => {
-//           acc[user] = (acc[user] || 0) + count;
-//         });
-//         return acc;
-//       }, {} as { [username: string]: number }),
-//     });
-//     return;
-//   } catch (err: any) {
-//     console.error("Error fetching squad insights:", err.message);
-//     res.status(500).json({ error: "Failed to fetch squad insights" });
-//   }
-// };
-
-export async function getPrCycleTimes(req: SquadRequest, res: Response) {
+export async function getPrCycleTimesAndThroughput(
+  req: SquadRequest,
+  res: Response
+) {
   const { from, to } = req.body as {
     from?: string;
     to?: string;
@@ -232,7 +46,57 @@ export async function getPrCycleTimes(req: SquadRequest, res: Response) {
       to as string
     );
 
-    res.json(data);
+    let aiInsights: any = null;
+    try {
+      const aiPrompt = `You are an expert engineering manager and scrum master. Analyze the following PR cycle time data and provide 2-3 actionable insights for the team. Analyze prCycleTimeEntries first and then provide insights based on the data. Focus on identifying patterns, bottlenecks, and areas for improvement. Provide your insights in a JSON array of strings format. Then analyze prCountPerRepo and commitsPerDay together and provide 2-3 additional insights based on the overall activity and trends in the data.
+      \n\nData: ${JSON.stringify(data).slice(0, 4000)}\n\nInsights:`;
+
+      // const params: Anthropic.MessageCreateParams = {
+      //   max_tokens: 1024,
+      //   messages: [{ role: "user", content: aiPrompt }],
+      //   model: anthropicConfig.model,
+      // };
+      // aiInsights = await client.messages.create(params);
+
+      // if (
+      //   aiInsights &&
+      //   aiInsights.content &&
+      //   aiInsights.content.length > 0 &&
+      //   aiInsights.content[0].type === "text"
+      // ) {
+      //   const text = aiInsights.content[0].text;
+      //   // Match any array of strings, not just those in ```json blocks
+      //   const arrayBlocks = [
+      //     ...text.matchAll(/\[\s*("[^"]+"(?:\s*,\s*"[^"]+")*)\s*\]/g),
+      //   ];
+
+      //   const prCycleTimeInsights = arrayBlocks[0]
+      //     ? [...arrayBlocks[0][1].matchAll(/"([^"]+)"/g)].map((m) => m[1])
+      //     : [];
+      //   const prCountAndCommitsInsights = arrayBlocks[1]
+      //     ? [...arrayBlocks[1][1].matchAll(/"([^"]+)"/g)].map((m) => m[1])
+      //     : [];
+
+      aiInsights = {
+        prCycleTimeInsights: [
+          "Many PRs (4 out of 7) lack any review activity, suggesting a potential gap in the code review process and possibly indicating insufficient collaboration practices",
+          "The average time between PR creation and merge for completed PRs is relatively short (around 30-45 minutes), which could indicate either very efficient reviews or possibly rushed reviews that might miss important issues",
+          "Most PRs contain single commits and are created immediately after the commit, showing a pattern of small, atomic changes which is generally good practice",
+        ],
+        prCountAndCommitsInsights: [
+          "Activity is concentrated in two main repositories with similar PR counts (hudl-gitflow: 4, tmp-fargo: 3), suggesting balanced work distribution across projects",
+          "Commit activity shows a clear pattern of low volume (1-2 commits per day) but consistent daily contributions, which might indicate either small incremental changes or potential under-utilization of version control",
+          "There's a noticeable gap in activity between May 30 and June 3, which could indicate sprint boundaries or potential workflow interruptions that might need investigation",
+        ],
+        raw: 'Let me analyze the data and provide insights:\n\nFirst, analyzing prCycleTimeEntries:\n```json\n[\n  "Many PRs (4 out of 7) lack any review activity, suggesting a potential gap in the code review process and possibly indicating insufficient collaboration practices",\n  "The average time between PR creation and merge for completed PRs is relatively short (around 30-45 minutes), which could indicate either very efficient reviews or possibly rushed reviews that might miss important issues",\n  "Most PRs contain single commits and are created immediately after the commit, showing a pattern of small, atomic changes which is generally good practice"\n]\n```\n\nAnalyzing prCountPerRepo and commitsPerDay together:\n```json\n[\n  "Activity is concentrated in two main repositories with similar PR counts (hudl-gitflow: 4, tmp-fargo: 3), suggesting balanced work distribution across projects",\n  "Commit activity shows a clear pattern of low volume (1-2 commits per day) but consistent daily contributions, which might indicate either small incremental changes or potential under-utilization of version control",\n  "There\'s a noticeable gap in activity between May 30 and June 3, which could indicate sprint boundaries or potential workflow interruptions that might need investigation"\n]\n```',
+      } as any;
+      // }
+    } catch (aiErr) {
+      console.error("AI Insights error:", aiErr);
+      aiInsights = null;
+    }
+
+    res.json({ ...data, aiInsights });
     return;
   } catch (err: any) {
     console.error(err);
