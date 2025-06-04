@@ -2,14 +2,20 @@ import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import type { PRCycleTime } from "@/types/insights";
-import { RepoInsightsTabs } from "@/components/chart/prCycleTime";
+import { CycleTimeMetrics } from "@/components/PRCycleTimeMetrics";
 import { Input } from "@/components/ui/input";
-import { SimpleBarChart } from "@/components/chart/simpleBar";
+import PRCommmitActivity from "./PRCommmitActivity";
+import Sidebar from "./ui/sidebar";
 
 type SquadInsightsResponse = {
   prCycleTimeEntries: PRCycleTime[];
   commitsPerDay: Record<string, number>;
   prCountPerRepo: Record<string, number>;
+  aiInsights: {
+    prCycleTimeInsights: Array<string>;
+    prCountAndCommitsInsights: Array<string>;
+    raw: string;
+  };
 };
 
 export default function Dashboard() {
@@ -26,25 +32,28 @@ export default function Dashboard() {
   });
 
   useEffect(() => {
-    try {
-      const fetchInsights = async () => {
+    const fetchInsights = async () => {
+      try {
         const payload = {
-          githubUsername: localStorage.getItem("github_username") || "",
           from: from || "2025-05-25",
           to: to || undefined,
         };
-
         const res = await axios.post(
-          "http://localhost:8080/api/insights/squad",
-          payload
+          "http://localhost:8080/api/insights/squad/pr-cycle-and-throughput",
+          payload,
+          {
+            headers: {
+              "x-github-username":
+                localStorage.getItem("github_username") || "",
+            },
+          }
         );
         setData(res.data);
-      };
-
-      fetchInsights();
-    } catch (error) {
-      console.error(error);
-    }
+      } catch {
+        setData(null);
+      }
+    };
+    fetchInsights();
   }, [from, to]);
 
   if (!data) {
@@ -52,74 +61,49 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">Squad Insights</h2>
-        <div className="flex items-center space-x-2">
-          <label className="text-sm font-medium text-gray-700">From:</label>
-          <Input
-            type="date"
-            value={from}
-            onChange={(e) => setFrom(e.target.value)}
-            max={to || undefined}
-            className="w-36"
-          />
-          <label className="text-sm font-medium text-gray-700">To:</label>
-          <Input
-            type="date"
-            value={to}
-            onChange={(e) => setTo(e.target.value)}
-            min={from || undefined}
-            className="w-36"
-          />
-          <Button
-            variant="outline"
-            onClick={() => {
-              setFrom("");
-              setTo("");
-            }}
-          >
-            Reset
-          </Button>
+    <div className="min-h-screen bg-gray-50 flex flex-row">
+      <Sidebar />
+      <main className="flex-1 flex flex-col gap-2 p-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
+          <h2 className="text-xl font-semibold">Squad Insights</h2>
+          <div className="flex items-center space-x-2">
+            <label className="text-sm font-medium text-gray-700">From:</label>
+            <Input
+              type="date"
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
+              max={to || undefined}
+              className="w-36"
+            />
+            <label className="text-sm font-medium text-gray-700">To:</label>
+            <Input
+              type="date"
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+              min={from || undefined}
+              className="w-36"
+            />
+            <Button
+              variant="outline"
+              onClick={() => {
+                setFrom("");
+                setTo("");
+              }}
+            >
+              Reset
+            </Button>
+          </div>
         </div>
-      </div>
-
-      <RepoInsightsTabs prs={data.prCycleTimeEntries} />
-      <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div>
-          <SimpleBarChart
-            data={data.commitsPerDay}
-            title="Commits Per Day"
-            xAxisLabel="number of commits"
-          />
-        </div>
-        <div>
-          <SimpleBarChart
-            data={data.prCountPerRepo}
-            title="PR's Per Squad Repo"
-            xAxisLabel="number of pr's"
-          />
-        </div>
-        <div>
-          <SimpleBarAIInsights />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function SimpleBarAIInsights() {
-  return (
-    <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded">
-      <h3 className="text-base font-semibold mb-2 text-green-900">
-        AI Insights (Coming Soon)
-      </h3>
-      <ul className="list-disc pl-5 text-green-800 text-sm space-y-1">
-        <li>AI will highlight unusual commit or PR activity trends here.</li>
-        <li>Automated detection of peak productivity days.</li>
-        <li>Repo-specific PR/commit anomalies and suggestions.</li>
-        <li>Personalized insights on team contribution patterns.</li>
-      </ul>
+        <CycleTimeMetrics
+          prs={data.prCycleTimeEntries}
+          aiInsights={data.aiInsights.prCycleTimeInsights}
+        />
+        <PRCommmitActivity
+          commitsPerDay={data.commitsPerDay}
+          prCountPerRepo={data.prCountPerRepo}
+          prCountAndCommitsInsights={data.aiInsights.prCountAndCommitsInsights}
+        />
+      </main>
     </div>
   );
 }
