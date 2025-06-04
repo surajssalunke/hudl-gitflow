@@ -56,6 +56,21 @@ export default function Dashboard() {
     fetchInsights();
   }, [from, to]);
 
+  const handleDownloadJSON = () => {
+    if (!data) return;
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `squad-insights-${from}-to-${to}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   if (!data) {
     return <div className="text-center">Loading...</div>;
   }
@@ -91,6 +106,9 @@ export default function Dashboard() {
               }}
             >
               Reset
+            </Button>
+            <Button variant="outline" onClick={handleDownloadJSON}>
+              Download JSON
             </Button>
           </div>
         </div>
