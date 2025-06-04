@@ -2,10 +2,11 @@
   "name": "hudl-gh",
   "version": "1.0.0",
   "main": "index.ts",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "build": "tsc",
-    "start": "npm run build && node build/index.js"
+    "start-mcp": "npm run build && node build/src/mcp.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts"
   },
   "keywords": [],
   "author": "",
@@ -15,13 +16,17 @@
     "@anthropic-ai/sdk": "^0.50.3",
     "@modelcontextprotocol/sdk": "^1.11.1",
     "axios": "^1.9.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.5.0",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "octokit": "^5.0.3"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.18",
     "@types/express": "^5.0.2",
     "@types/morgan": "^1.9.9",
     "@types/node": "^22.15.17",
+    "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3"
   }
 }
