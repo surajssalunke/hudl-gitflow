@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Navbar } from "@/components/ui/navbar";
 import Dashboard from "../components/Dashboard";
-import Agent from "../components/Agent";
+import AIAssistant from "../components/AIAssistant";
 
 export default function Main() {
   const [activeTab, setActiveTab] = useState("insights");
@@ -14,13 +14,13 @@ export default function Main() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 rounded-xl border border-black/30">
+    <div className="min-h-screen bg-gray-5">
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onLogout={onLogoutHandler}
       />
-      {activeTab === "insights" ? <Dashboard /> : <Agent />}
+      {activeTab === "insights" ? <Dashboard /> : <AIAssistant />}
     </div>
   );
 }

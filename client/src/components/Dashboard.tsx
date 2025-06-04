@@ -19,6 +19,8 @@ type SquadInsightsResponse = {
 };
 
 export default function Dashboard() {
+  const [selectedMember, setSelectedMember] = useState<string | null>(null);
+  const [selectedRepo, setSelectedRepo] = useState<string | null>(null);
   const [data, setData] = useState<SquadInsightsResponse | null>(null);
   const [from, setFrom] = useState(() => {
     const today = new Date();
@@ -72,12 +74,43 @@ export default function Dashboard() {
   };
 
   if (!data) {
-    return <div className="text-center">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen w-full bg-gray-50">
+        <div className="flex flex-col items-center">
+          <svg
+            className="animate-spin h-8 w-8 text-blue-500 mb-3"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+            ></path>
+          </svg>
+          <span className="text-gray-600 text-lg font-medium">Loading...</span>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-row">
-      <Sidebar />
+      <Sidebar
+        selectedMember={selectedMember}
+        selectedRepo={selectedRepo}
+        setSelectedMember={setSelectedMember}
+        setSelectedRepo={setSelectedRepo}
+      />
       <main className="flex-1 flex flex-col gap-2 p-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-2">
           <h2 className="text-xl font-semibold">Squad Insights</h2>
@@ -100,6 +133,7 @@ export default function Dashboard() {
             />
             <Button
               variant="outline"
+              className="border-red-500 text-red-700 hover:bg-red-50 hover:border-red-600 focus:ring-red-200"
               onClick={() => {
                 setFrom("");
                 setTo("");
@@ -107,7 +141,11 @@ export default function Dashboard() {
             >
               Reset
             </Button>
-            <Button variant="outline" onClick={handleDownloadJSON}>
+            <Button
+              variant="outline"
+              className="border-blue-500 text-blue-700 hover:bg-blue-50 hover:border-blue-600 focus:ring-blue-200"
+              onClick={handleDownloadJSON}
+            >
               Download JSON
             </Button>
           </div>

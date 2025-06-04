@@ -2,8 +2,21 @@ import cors from "cors";
 import express from "express";
 import morgan from "morgan";
 import routes from "./routes";
+import MCPClient from "./services/mcp";
 
 const app = express();
+
+const mcpClient = new MCPClient();
+mcpClient
+  .connectToServer()
+  .then(() => {
+    app.locals.mcpClient = mcpClient;
+  })
+  .catch((error) => {
+    mcpClient.cleanup();
+    console.error("Failed to connect to MCP server:", error);
+    process.exit(1);
+  });
 
 app.use(express.json());
 app.use(morgan("dev"));
