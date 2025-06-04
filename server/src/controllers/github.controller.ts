@@ -210,8 +210,8 @@ export async function getPrCycleTimes(req: SquadRequest, res: Response) {
     to?: string;
   };
 
-  if (!req.squad || !from || !to) {
-    res.status(400).json({ error: "Missing params: squad, from, to" });
+  if (!req.squad || !from) {
+    res.status(400).json({ error: "Missing params: squad, from" });
     return;
   }
 

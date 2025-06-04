@@ -89,7 +89,7 @@ class MCPClient {
 
     for (const content of response.content) {
       if (content.type === "text") {
-        finalText.push(content.text);
+        finalText.push(content.text as never);
       } else if (content.type === "tool_use") {
         const toolName = content.name;
         const toolArgs = content.input as { [x: string]: unknown } | undefined;
@@ -98,9 +98,11 @@ class MCPClient {
           name: toolName,
           arguments: toolArgs,
         });
-        toolResults.push(result);
+        toolResults.push(result as never);
         finalText.push(
-          `[Calling tool ${toolName} with args ${JSON.stringify(toolArgs)}]`
+          `[Calling tool ${toolName} with args ${JSON.stringify(
+            toolArgs
+          )}]` as never
         );
 
         this.messages.push({
@@ -115,7 +117,9 @@ class MCPClient {
         });
 
         finalText.push(
-          response.content[0].type === "text" ? response.content[0].text : ""
+          response.content[0].type === "text"
+            ? (response.content[0].text as never)
+            : ("" as never)
         );
       }
     }

@@ -1,6 +1,6 @@
 const squads = {
   "squad-gitflow": {
-    repos: ["hudl-gitflow", "tmp-fargo", "tmp-HudlFfmpeg"],
+    repos: ["hudl-gitflow", "tmp-fargo"],
     members: ["surajssalunke", "git-gius"],
   },
 };
