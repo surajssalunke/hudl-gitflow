@@ -109,11 +109,19 @@ export default function Sidebar({
             <ul className="text-sm text-gray-700 space-y-1">
               <li className="flex items-center gap-2">
                 <span className="inline-block w-2 h-2 bg-purple-400 rounded-full"></span>
-                Draft PR
+                Pull Request Forecasts
               </li>
               <li className="flex items-center gap-2">
                 <span className="inline-block w-2 h-2 bg-purple-400 rounded-full"></span>
-                Submit Review
+                Deployment Forcasts
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="inline-block w-2 h-2 bg-purple-400 rounded-full"></span>
+                Draft a PR
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="inline-block w-2 h-2 bg-purple-400 rounded-full"></span>
+                Submit a Review For PR
               </li>
             </ul>
           </div>

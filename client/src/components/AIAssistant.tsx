@@ -102,7 +102,7 @@ export default function AIAssistant() {
           )}
           {hasMessages && (
             <div
-              className="w-full max-w-2xl flex-1 flex flex-col gap-2 mb-4 overflow-y-auto pr-2"
+              className="w-full max-w-4xl flex-1 flex flex-col gap-2 mb-4 overflow-y-auto pr-2"
               style={{
                 scrollbarWidth: "thin",
                 scrollbarColor: "rgba(0,0,0,0.08) rgba(0,0,0,0)",
@@ -127,7 +127,7 @@ export default function AIAssistant() {
             </div>
           )}
           <div
-            className={`w-full max-w-2xl ${
+            className={`w-full max-w-4xl ${
               hasMessages ? "mb-2" : "flex flex-col flex-1 justify-center"
             }`}
             style={
@@ -141,7 +141,7 @@ export default function AIAssistant() {
             }
           >
             {!hasMessages && !isSendDisabled && (
-              <div className="w-full max-w-2xl mb-4">
+              <div className="w-full max-w-4xl mb-4">
                 <div className="bg-gray-50 border border-gray-200 rounded text-gray-700 text-sm px-4 py-3 mb-2 text-center">
                   Ask the AI to analyze PRs, reviews, or member activity. Try
                   prompts like:
