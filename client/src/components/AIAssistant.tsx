@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Sidebar from "./ui/sidebar";
 import axios from "axios";
-import ReactMarkdown from "react-markdown";
+import MarkdownPreview from "@uiw/react-markdown-preview";
 
 const createAssistantPrompt = (
   userQuery: string,
@@ -24,7 +24,9 @@ Use any available tools or data sources to provide a thorough and helpful respon
 - Review participation and feedback patterns
 - Rework or back-and-forth trends
 
-Format your response in clear, structured Markdown with bullet points, tables, and summaries where helpful.
+Format your response in clear, structured Markdown with bullet points, tables, and summaries where helpful. 
+
+Don't keep any unnecessary empty lines and spaces in response and remove your tool call information.
 `;
 };
 
@@ -118,7 +120,13 @@ export default function AIAssistant() {
                 >
                   <span className="font-semibold mr-2">{msg.sender}:</span>
                   {msg.sender === "Assistant" ? (
-                    <ReactMarkdown>{msg.text}</ReactMarkdown>
+                    <MarkdownPreview
+                      className="bg-gray-100 p-2"
+                      wrapperElement={{
+                        "data-color-mode": "light",
+                      }}
+                      source={msg.text}
+                    />
                   ) : (
                     msg.text
                   )}
