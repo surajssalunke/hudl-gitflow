@@ -3,6 +3,7 @@ import express from "express";
 import morgan from "morgan";
 import routes from "./routes";
 import MCPClient from "./services/mcp";
+import BedrockClient from "./services/bedrock";
 
 const app = express();
 
@@ -17,6 +18,8 @@ mcpClient
     console.error("Failed to connect to MCP server:", error);
     process.exit(1);
   });
+const bedrockClient = new BedrockClient();
+app.locals.bedrockClient = bedrockClient;
 
 app.use(express.json());
 app.use(morgan("dev"));

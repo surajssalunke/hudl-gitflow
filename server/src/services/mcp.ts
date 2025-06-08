@@ -5,7 +5,8 @@ import {
 } from "@anthropic-ai/sdk/resources/messages/messages.mjs";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
-import { anthropicConfig, githubConfig } from "../config/github";
+import { anthropicConfig, githubConfig } from "../config";
+import readline from "readline/promises";
 
 const ANTHROPIC_API_KEY = anthropicConfig.apiKey;
 if (!ANTHROPIC_API_KEY) {
@@ -120,6 +121,29 @@ export default class MCPClient {
     }
 
     return finalText.join("\n");
+  }
+
+  async chatLoop() {
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    });
+
+    try {
+      console.log("\nMCP Client Started!");
+      console.log("Type your queries or 'quit' to exit.");
+
+      while (true) {
+        const message = await rl.question("\nQuery: ");
+        if (message.toLowerCase() === "quit") {
+          break;
+        }
+        const response = await this.processQuery(message);
+        console.log("\n" + response);
+      }
+    } finally {
+      rl.close();
+    }
   }
 
   async cleanup() {

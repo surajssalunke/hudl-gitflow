@@ -11,3 +11,9 @@ export const anthropicConfig = {
   apiKey: process.env.ANTHROPIC_API_KEY!,
   model: "claude-3-5-sonnet-latest",
 };
+
+export const awsConfig = {
+  region: process.env.AWS_REGION!,
+  credentialsProfile: process.env.AWS_CREDENTIALS_PROFILE!,
+  bedrockModelId: process.env.AWS_BEDROCK_MODEL_ID!,
+};

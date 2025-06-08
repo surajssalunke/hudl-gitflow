@@ -113,7 +113,7 @@ export default function Sidebar({
               </li>
               <li className="flex items-center gap-2">
                 <span className="inline-block w-2 h-2 bg-purple-400 rounded-full"></span>
-                Deployment Forcasts
+                Deployment Forecasts
               </li>
               <li className="flex items-center gap-2">
                 <span className="inline-block w-2 h-2 bg-purple-400 rounded-full"></span>

@@ -1,8 +1,7 @@
 import axios from "axios";
 import { Request, Response } from "express";
-import { Octokit } from "octokit";
 
-import { githubConfig } from "../config/github";
+import { githubConfig } from "../config";
 
 const { clientId, clientSecret, callbackUrl } = githubConfig;
 
@@ -22,7 +21,6 @@ export const githubCallback = async (
   }
 
   try {
-    // Exchange code for access token
     const tokenRes = await axios.post(
       `https://github.com/login/oauth/access_token`,
       {

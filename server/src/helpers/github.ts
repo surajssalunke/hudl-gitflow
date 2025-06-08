@@ -1,5 +1,5 @@
 import { Octokit } from "octokit";
-import { githubConfig } from "../config/github";
+import { githubConfig } from "../config";
 
 export type PRCycleTimeEntry = {
   prNumber: number;
