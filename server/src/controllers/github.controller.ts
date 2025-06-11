@@ -45,18 +45,13 @@ export async function getPrCycleTimesAndThroughput(
       const aiPrompt = `You are an expert engineering manager and scrum master. Analyze the following PR cycle time data and provide 2-3 actionable insights for the team. Analyze prCycleTimeEntries first and then provide insights based on the data. Focus on identifying patterns, bottlenecks, and areas for improvement. Provide your insights in a JSON array of strings format. Then analyze prCountPerRepo and commitsPerDay together and provide 2-3 additional insights based on the overall activity and trends in the data.
       \n\nData: ${JSON.stringify(data).slice(0, 4000)}\n\nInsights:`;
 
-      const modelResponse = await req.app.locals.bedrockClient.invokeModel(
+      const modelResponse = await req.app.locals.bedrockClient.converse(
         aiPrompt
       );
 
-      if (
-        modelResponse &&
-        modelResponse.completion &&
-        modelResponse.completion.length > 0
-      ) {
-        const text = modelResponse.completion;
+      if (modelResponse) {
         const arrayBlocks = [
-          ...text.matchAll(/\[\s*("[^"]+"(?:\s*,\s*"[^"]+")*)\s*\]/g),
+          ...modelResponse.matchAll(/\[\s*("[^"]+"(?:\s*,\s*"[^"]+")*)\s*\]/g),
         ];
 
         const prCycleTimeInsights = arrayBlocks[0]
@@ -66,16 +61,10 @@ export async function getPrCycleTimesAndThroughput(
           ? [...arrayBlocks[1][1].matchAll(/"([^"]+)"/g)].map((m) => m[1])
           : [];
 
-        console.log("AI Insights:", {
-          prCycleTimeInsights,
-          prCountAndCommitsInsights,
-          raw: modelResponse.completion,
-        });
-
         aiInsights = {
           prCycleTimeInsights,
           prCountAndCommitsInsights,
-          raw: text,
+          raw: modelResponse,
         };
       }
     } catch (aiErr) {

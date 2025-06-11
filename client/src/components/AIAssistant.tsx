@@ -10,23 +10,10 @@ const createAssistantPrompt = (
   repoName: string,
   memberName: string
 ) => {
-  return `You are a senior engineering assistant integrated into a GitHub insights tool. You specialize in analyzing pull requests, reviews, commits, and developer workflows to help engineering teams improve code quality, collaboration, and velocity.
-
-The user has asked: "${userQuery}"
-
-Context:
-- Repository: "${repoName}"
-- Squad member: "${memberName}" (if any)
-
-Use any available tools or data sources to provide a thorough and helpful response. If applicable, analyze:
-- Pull request timelines (e.g., creation → review → merge)
-- Number and quality of commits
-- Review participation and feedback patterns
-- Rework or back-and-forth trends
-
-Format your response in clear, structured Markdown with bullet points, tables, and summaries where helpful. 
-
-Don't keep any unnecessary empty lines and spaces in response and remove your tool call information.
+  return `${userQuery}. 
+  The username is ${memberName} and the repo is ${repoName}.
+  Format your response in clear, structured Markdown with bullet points, tables, and summaries where helpful. 
+  Don't keep any unnecessary empty lines and spaces in response and remove your tool call information.
 `;
 };
 

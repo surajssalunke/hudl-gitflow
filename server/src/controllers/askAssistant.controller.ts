@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import axios from "axios";
 
 export async function ask(req: Request, res: Response) {
   try {
@@ -9,13 +10,11 @@ export async function ask(req: Request, res: Response) {
         .json({ error: "Missing or invalid 'query' in request body" });
       return;
     }
-    const mcpClient = req.app.locals.mcpClient;
-    if (!mcpClient) {
-      res.status(500).json({ error: "MCP client not initialized" });
-      return;
-    }
-    const result = await mcpClient.processQuery(query);
-    res.json({ result });
+    const apiResponse = await axios.post("http://localhost:8000/invoke", {
+      prompt: query,
+    });
+    const response = apiResponse.data?.response;
+    res.json({ result: response });
     return;
   } catch (error) {
     console.error("Error in askAssistant controller:", error);

@@ -1,6 +1,6 @@
 import {
   BedrockRuntimeClient,
-  InvokeModelCommand,
+  ConverseCommand,
 } from "@aws-sdk/client-bedrock-runtime";
 import { fromIni } from "@aws-sdk/credential-provider-ini";
 import { awsConfig } from "../config";
@@ -32,20 +32,26 @@ export default class BedrockClient {
     });
   }
 
-  async invokeModel(prompt: string, maxTokens: number = 1024) {
-    const command = new InvokeModelCommand({
+  async converse(prompt: string) {
+    const command = new ConverseCommand({
       modelId: this.modelId,
-      contentType: "application/json",
-      accept: "application/json",
-      body: JSON.stringify({
-        prompt: `\n\nHuman: ${prompt}\n\nAssistant:`,
-        max_tokens_to_sample: maxTokens,
-      }),
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              text: prompt,
+            },
+          ],
+        },
+      ],
     });
     try {
       const response = await this.client.send(command);
-      const responseBody = Buffer.from(response.body).toString("utf8");
-      const parsedResponse = JSON.parse(responseBody);
+      const parsedResponse =
+        response.output?.message?.content
+          ?.map((content) => content.text)
+          .join("\n") || "No response content";
       return parsedResponse;
     } catch (error) {
       console.error("Error invoking model:", error);
@@ -68,7 +74,7 @@ export default class BedrockClient {
         if (message.toLowerCase() === "quit") {
           break;
         }
-        const response = await this.invokeModel(message);
+        const response = await this.converse(message);
         console.log("\n" + response);
       }
     } finally {

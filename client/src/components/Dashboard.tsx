@@ -152,12 +152,12 @@ export default function Dashboard() {
         </div>
         <CycleTimeMetrics
           prs={data.prCycleTimeEntries}
-          aiInsights={data.aiInsights.prCycleTimeInsights}
+          aiInsights={data.aiInsights?.prCycleTimeInsights}
         />
         <PRCommmitActivity
           commitsPerDay={data.commitsPerDay}
           prCountPerRepo={data.prCountPerRepo}
-          prCountAndCommitsInsights={data.aiInsights.prCountAndCommitsInsights}
+          prCountAndCommitsInsights={data.aiInsights?.prCountAndCommitsInsights}
         />
       </main>
     </div>
