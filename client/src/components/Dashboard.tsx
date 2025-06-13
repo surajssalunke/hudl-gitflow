@@ -6,11 +6,21 @@ import { CycleTimeMetrics } from "@/components/PRCycleTimeMetrics";
 import { Input } from "@/components/ui/input";
 import PRCommmitActivity from "./PRCommmitActivity";
 import Sidebar from "./ui/sidebar";
+import ReviewMetricsPerRepoCard from "./ReviewMetricsPerRepoCard";
 
 type SquadInsightsResponse = {
   prCycleTimeEntries: PRCycleTime[];
   commitsPerDay: Record<string, number>;
   prCountPerRepo: Record<string, number>;
+  reviewMetricsPerRepo: Record<
+    string,
+    {
+      averageReviewCount: number;
+      averageTimeToFirstReview: number;
+      reviewCompletionRate: number;
+      prsWithReworkCount: number;
+    }
+  >;
   aiInsights: {
     prCycleTimeInsights: Array<string>;
     prCountAndCommitsInsights: Array<string>;
@@ -158,6 +168,9 @@ export default function Dashboard() {
           commitsPerDay={data.commitsPerDay}
           prCountPerRepo={data.prCountPerRepo}
           prCountAndCommitsInsights={data.aiInsights?.prCountAndCommitsInsights}
+        />
+        <ReviewMetricsPerRepoCard
+          reviewMetricsPerRepo={data.reviewMetricsPerRepo}
         />
       </main>
     </div>

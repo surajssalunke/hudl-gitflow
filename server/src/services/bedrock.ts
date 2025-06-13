@@ -3,7 +3,7 @@ import {
   ConverseCommand,
 } from "@aws-sdk/client-bedrock-runtime";
 import { fromIni } from "@aws-sdk/credential-provider-ini";
-import { awsConfig } from "../config";
+import { awsConfig, env } from "../config";
 import readline from "readline/promises";
 
 const AWS_REGION = awsConfig.region;
@@ -26,10 +26,18 @@ export default class BedrockClient {
   private credentialsProfile = AWS_CREDENTIALS_PROFILE;
 
   constructor() {
-    this.client = new BedrockRuntimeClient({
-      region: this.region,
-      credentials: fromIni({ profile: this.credentialsProfile }),
-    });
+    if (env === "development") {
+      this.client = new BedrockRuntimeClient({
+        region: this.region,
+        credentials: fromIni({
+          profile: this.credentialsProfile,
+        }),
+      });
+    } else {
+      this.client = new BedrockRuntimeClient({
+        region: this.region,
+      });
+    }
   }
 
   async converse(prompt: string) {

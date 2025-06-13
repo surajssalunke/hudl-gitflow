@@ -17,3 +17,5 @@ export const awsConfig = {
   credentialsProfile: process.env.AWS_CREDENTIALS_PROFILE!,
   bedrockModelId: process.env.AWS_BEDROCK_MODEL_ID!,
 };
+
+export const env = process.env.ENV || "development";
