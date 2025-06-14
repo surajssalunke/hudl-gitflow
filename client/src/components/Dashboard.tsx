@@ -28,6 +28,11 @@ type SquadInsightsResponse = {
   };
 };
 
+let SERVER_HOST_URL = "http://localhost:8080";
+if (import.meta.env.PROD) {
+  SERVER_HOST_URL = "";
+}
+
 export default function Dashboard() {
   const [selectedMember, setSelectedMember] = useState<string | null>(null);
   const [selectedRepo, setSelectedRepo] = useState<string | null>(null);
@@ -51,7 +56,7 @@ export default function Dashboard() {
           to: to || undefined,
         };
         const res = await axios.post(
-          "http://localhost:8080/api/insights/squad/pr-cycle-and-throughput",
+          `${SERVER_HOST_URL}/api/insights/squad/pr-cycle-and-throughput`,
           payload,
           {
             headers: {

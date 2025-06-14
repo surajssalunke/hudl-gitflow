@@ -1,6 +1,11 @@
 import { useEffect } from "react";
 import { FaGithub } from "react-icons/fa";
 
+let SERVER_HOST_URL = "http://localhost:8080";
+if (import.meta.env.PROD) {
+  SERVER_HOST_URL = "";
+}
+
 function Login() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -18,7 +23,7 @@ function Login() {
   }, []);
 
   const handleLogin = () => {
-    window.location.href = "http://localhost:8080/api/auth/github";
+    window.location.href = `${SERVER_HOST_URL}/api/auth/github`;
   };
 
   return (

@@ -5,6 +5,11 @@ import Sidebar from "./ui/sidebar";
 import axios from "axios";
 import MarkdownPreview from "@uiw/react-markdown-preview";
 
+let SERVER_HOST_URL = "http://localhost:8080";
+if (import.meta.env.PROD) {
+  SERVER_HOST_URL = "";
+}
+
 const createAssistantPrompt = (
   userQuery: string,
   repoName: string,
@@ -34,7 +39,7 @@ export default function AIAssistant() {
     setInput("");
     try {
       const res = await axios.post(
-        "http://localhost:8080/api/assistant/ask",
+        `${SERVER_HOST_URL}/api/assistant/ask`,
         {
           query: createAssistantPrompt(
             userQuery,

@@ -1,9 +1,14 @@
 import axios from "axios";
 import { Request, Response } from "express";
 
-import { githubConfig } from "../config";
+import { env, githubConfig } from "../config";
 
 const { clientId, clientSecret, callbackUrl } = githubConfig;
+
+let CLIENT_HOST_URL = "http://localhost:5173";
+if (env !== "development") {
+  CLIENT_HOST_URL = "";
+}
 
 export const loginWithGitHub = (_: Request, res: Response) => {
   const redirectUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${callbackUrl}&scope=read:org,repo`;
@@ -50,7 +55,7 @@ export const githubCallback = async (
 
     const user = userRes.data;
     res.redirect(
-      `http://localhost:5173/login?username=${
+      `${CLIENT_HOST_URL}/login?username=${
         user.login
       }&avatar_url=${encodeURIComponent(
         user.avatar_url

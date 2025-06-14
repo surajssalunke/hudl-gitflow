@@ -9,6 +9,11 @@ type TProps = {
   setSelectedRepo: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
+let SERVER_HOST_URL = "http://localhost:8080";
+if (import.meta.env.PROD) {
+  SERVER_HOST_URL = "";
+}
+
 export default function Sidebar({
   activePage = "dashboard",
   selectedMember,
@@ -25,15 +30,11 @@ export default function Sidebar({
   useEffect(() => {
     const fetchSquadInfo = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:8080/api/insights/squad/",
-          {
-            headers: {
-              "x-github-username":
-                localStorage.getItem("github_username") || "",
-            },
-          }
-        );
+        const res = await axios.get(`${SERVER_HOST_URL}/api/insights/squad`, {
+          headers: {
+            "x-github-username": localStorage.getItem("github_username") || "",
+          },
+        });
         if (res.data.squad && res.data.members && res.data.repos) {
           setSquadInfo({
             squad: res.data.squad,

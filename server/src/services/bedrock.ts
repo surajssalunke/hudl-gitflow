@@ -19,6 +19,21 @@ if (!AWS_CREDENTIALS_PROFILE) {
   throw new Error("AWS_CREDENTIALS_PROFILE is not set");
 }
 
+const accessKeyId = awsConfig.accessKeyId;
+const secretAccessKey = awsConfig.secretAccessKey;
+const sessionToken = awsConfig.sessionToken;
+if (env !== "development") {
+  if (!accessKeyId) {
+    throw new Error("AWS_ACCESS_KEY_ID is not set");
+  }
+  if (!secretAccessKey) {
+    throw new Error("AWS_SECRET_ACCESS_KEY is not set");
+  }
+  if (!sessionToken) {
+    throw new Error("AWS_SESSION_TOKEN is not set");
+  }
+}
+
 export default class BedrockClient {
   private client: BedrockRuntimeClient;
   private region = AWS_REGION;
@@ -36,6 +51,11 @@ export default class BedrockClient {
     } else {
       this.client = new BedrockRuntimeClient({
         region: this.region,
+        credentials: {
+          accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+          sessionToken: process.env.AWS_SESSION_TOKEN,
+        },
       });
     }
   }
