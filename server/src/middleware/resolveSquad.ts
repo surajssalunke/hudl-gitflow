@@ -24,7 +24,7 @@ export const resolveSquad = (
 
   for (const [squad, data] of Object.entries(squads)) {
     if (data.members.includes(githubUsername)) {
-      req.owner = githubUsername;
+      req.owner = "surajssalunke";
       req.squad = squad;
       req.members = data.members || [];
       req.repos = data.repos || [];

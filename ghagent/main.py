@@ -5,34 +5,34 @@ import os
 dotenv_path = Path("../.env")
 load_dotenv(dotenv_path=dotenv_path)
 
-from InlineAgent.tools import MCPHttp, MCPStdio
+from InlineAgent.tools import MCPHttp
 from InlineAgent.action_group import ActionGroup
 from InlineAgent.agent import InlineAgent
-
-from config import github_server_params
 
 
 class BedrockGithubAgent:
     def __init__(
         self,
-        agent_name,
         foundation_model,
-        aws_profile,
+        agent_name,
         mcp_clients,
+        aws_region="us-east-1",
+        aws_profile=None,
         aws_access_key_id=None,
         aws_secret_access_key=None,
         aws_session_token=None,
     ):
         self.inline_agent = InlineAgent(
+            foundation_model=foundation_model,
+            agent_name=agent_name,
+            profile=aws_profile,
+            aws_region=aws_region,
             aws_access_key_id=aws_access_key_id,
             aws_secret_access_key=aws_secret_access_key,
             aws_session_token=aws_session_token,
-            agent_name=agent_name,
-            foundation_model=foundation_model,
             instruction="""You are a friendly assistant that is responsible for resolving user queries.
                         You have access to github tools.
                     """,
-            profile=aws_profile,
             action_groups=[
                 ActionGroup(
                     name="GithubActionGroup",
@@ -46,27 +46,24 @@ async def main():
     github_mcp_client = None
     try:
         agent = None
-        if os.getenv("ENV") == "development":
-            github_mcp_client = await MCPStdio.create(
-                server_params=github_server_params, max_parameters=10
-            )
+        github_mcp_client = await MCPHttp.create(
+            url="https://api.githubcopilot.com/mcp/",
+            headers={
+                "Authorization": f"Bearer {os.getenv('GITHUB_PERSONAL_ACCESS_TOKEN')}",
+                "Content-Type": "application/json",
+            },
+            max_parameters=10,
+            transport_mode="streamableHttp",
+        )
 
+        if os.getenv("ENV") == "development":
             agent = BedrockGithubAgent(
                 foundation_model=os.getenv("AWS_BEDROCK_MODEL_ID"),
                 agent_name="github-mcp-agent",
-                aws_profile=os.getenv("AWS_CREDENTIALS_PROFILE"),
                 mcp_clients=[github_mcp_client],
+                aws_profile=os.getenv("AWS_CREDENTIALS_PROFILE"),
             )
         else:
-            github_mcp_client = await MCPHttp.create(
-                url="https://api.githubcopilot.com/mcp/",
-                headers={
-                    "Authorization": f"Bearer {os.getenv('GITHUB_PERSONAL_ACCESS_TOKEN')}",
-                    "Content-Type": "application/json",
-                },
-                max_parameters=10,
-            )
-
             agent = BedrockGithubAgent(
                 foundation_model=os.getenv("AWS_BEDROCK_MODEL_ID"),
                 agent_name="github-mcp-agent",

@@ -33,7 +33,7 @@ COPY --from=node-build /app/server/build ./server
 COPY --from=node-build /app/server/node_modules ./server/node_modules
 
 # Copy environment variables
-# COPY .env ./.env
+COPY .env ./.env
 
 # Copy Python source
 COPY ghagent ./ghagent

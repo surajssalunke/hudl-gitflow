@@ -4,4 +4,4 @@ build
 
 __pycache__
 venv
-AwsAgentApi
+AwsInlineAgent

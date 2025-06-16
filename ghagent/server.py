@@ -34,27 +34,25 @@ agent = None
 
 async def initialize_agent():
     global github_mcp_client, agent
-    if os.getenv("ENV") == "development":
-        github_mcp_client = await MCPStdio.create(
-            server_params=github_server_params, max_parameters=10
-        )
 
+    github_mcp_client = await MCPHttp.create(
+        url="https://api.githubcopilot.com/mcp/",
+        headers={
+            "Authorization": f"Bearer {os.getenv('GITHUB_PERSONAL_ACCESS_TOKEN')}",
+            "Content-Type": "application/json",
+        },
+        max_parameters=10,
+        transport_mode="streamableHttp",
+    )
+
+    if os.getenv("ENV") == "development":
         agent = BedrockGithubAgent(
             foundation_model=os.getenv("AWS_BEDROCK_MODEL_ID"),
             agent_name="github-mcp-agent",
-            aws_profile=os.getenv("AWS_CREDENTIALS_PROFILE"),
             mcp_clients=[github_mcp_client],
+            aws_profile=os.getenv("AWS_CREDENTIALS_PROFILE"),
         )
     else:
-        github_mcp_client = await MCPHttp.create(
-            url="https://api.githubcopilot.com/mcp/",
-            headers={
-                "Authorization": f"Bearer {os.getenv('GITHUB_PERSONAL_ACCESS_TOKEN')}",
-                "Content-Type": "application/json",
-            },
-            max_parameters=10,
-        )
-
         agent = BedrockGithubAgent(
             foundation_model=os.getenv("AWS_BEDROCK_MODEL_ID"),
             agent_name="github-mcp-agent",
