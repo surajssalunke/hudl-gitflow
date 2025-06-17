@@ -10,13 +10,9 @@ if (import.meta.env.PROD) {
   SERVER_HOST_URL = "";
 }
 
-const createAssistantPrompt = (
-  userQuery: string,
-  repoName: string,
-  memberName: string
-) => {
+const createAssistantPrompt = (userQuery: string, repoName: string) => {
   return `${userQuery}. 
-  The username is ${memberName} and the repo is ${repoName}.
+  The username is surajssalunke and the repo is ${repoName}.
   Format your response in clear, structured Markdown with bullet points, tables, and summaries where helpful. 
   Don't keep any unnecessary empty lines and spaces in response and remove your tool call information.
 `;
@@ -41,11 +37,7 @@ export default function AIAssistant() {
       const res = await axios.post(
         `${SERVER_HOST_URL}/api/assistant/ask`,
         {
-          query: createAssistantPrompt(
-            userQuery,
-            selectedRepo!,
-            selectedMember!
-          ),
+          query: createAssistantPrompt(userQuery, selectedRepo!),
         },
         {
           headers: {

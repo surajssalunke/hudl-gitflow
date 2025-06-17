@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import type { PRCycleTime } from "@/types/insights";
@@ -47,9 +47,12 @@ export default function Dashboard() {
     const today = new Date();
     return today.toISOString().slice(0, 10);
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchInsights = async () => {
+      setLoading(true);
       try {
         const payload = {
           from: from || "2025-05-25",
@@ -66,8 +69,13 @@ export default function Dashboard() {
           }
         );
         setData(res.data);
-      } catch {
+      } catch (e) {
+        if (e instanceof AxiosError && e.response?.data.error) {
+          setError(e.response.data.error);
+        }
         setData(null);
+      } finally {
+        setLoading(false);
       }
     };
     fetchInsights();
@@ -88,7 +96,7 @@ export default function Dashboard() {
     URL.revokeObjectURL(url);
   };
 
-  if (!data) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen w-full bg-gray-50">
         <div className="flex flex-col items-center">
@@ -114,6 +122,16 @@ export default function Dashboard() {
           </svg>
           <span className="text-gray-600 text-lg font-medium">Loading...</span>
         </div>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="flex items-center justify-center min-h-screen w-full bg-gray-50">
+        <span className="text-gray-600 text-lg font-medium">
+          {error ? error : "No data available for the selected date range."}
+        </span>
       </div>
     );
   }

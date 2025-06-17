@@ -1,7 +1,11 @@
+const members = process.env.SQUAD_GITFLOW_MEMEBERS
+  ? process.env.SQUAD_GITFLOW_MEMEBERS.split(",")
+  : [];
+
 const squads = {
   "squad-gitflow": {
-    repos: ["hudl-gitflow", "tmp-fargo"],
-    members: ["surajssalunke", "git-gius"],
+    repos: ["hudl-gitflow", "tmp-fargo", "tmp-HudlFfmpeg"],
+    members,
   },
 };
 
