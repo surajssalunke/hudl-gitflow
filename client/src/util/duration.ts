@@ -1,4 +1,4 @@
-import type { PRCycleTime } from "@/types/insights";
+import type { PRCycleTime } from "@/types/squadInsights";
 
 export function computeClosePRStats(
   prs: PRCycleTime[],

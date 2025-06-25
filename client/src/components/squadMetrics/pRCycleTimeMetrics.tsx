@@ -1,12 +1,12 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import type { PRCycleTime } from "@/types/insights";
+import type { PRCycleTime } from "@/types/squadInsights";
 import {
   computeClosePRStats,
   computeOpenPRStats,
   getAvgDays,
 } from "@/util/duration";
-import { PRMetricsChartCard } from "./chart/prMetricsChart";
+import { PRMetricsChartCard } from "../chart/prMetricsChart";
 
 type PRStatsMetric = {
   label: string;
@@ -160,7 +160,7 @@ function AIInsights({ aiInsights }: { aiInsights: string[] }) {
   );
 }
 
-export function CycleTimeMetrics({
+export default function CycleTimeMetrics({
   prs,
   aiInsights,
 }: {

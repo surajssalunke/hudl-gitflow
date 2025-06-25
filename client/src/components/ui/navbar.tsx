@@ -1,22 +1,22 @@
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getActivePage, setActivePage } from "@/store/dashboardSlice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
-export function Navbar({
-  activeTab,
-  setActiveTab,
-  onLogout,
-}: {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
-  onLogout: () => void;
-}) {
+export function Navbar({ onLogout }: { onLogout: () => void }) {
   const isUserLoggedIn = !!localStorage.getItem("github_username");
+  const activeTab = useAppSelector(getActivePage);
+  const dispatch = useAppDispatch();
 
   return (
     <div className="flex items-center justify-between p-3 border-b rounded-t-xl bg-white/80 sticky top-0 z-30 backdrop-blur shadow-sm">
       <div className="flex items-center space-x-2">
         <span className="text-xl font-bold">GitFlow</span>
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="ml-2">
+        <Tabs
+          value={activeTab}
+          onValueChange={(tab) => dispatch(setActivePage(tab))}
+          className="ml-2"
+        >
           <TabsList>
             <TabsTrigger value="insights">Insights</TabsTrigger>
             <TabsTrigger value="ai-assistant">AI Assistant</TabsTrigger>

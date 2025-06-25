@@ -1,5 +1,5 @@
-import { SimpleBarChart } from "./chart/simpleBar";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { SimpleBarChart } from "../chart/simpleBar";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 
 type TProps = {
   commitsPerDay: Record<string, number>;

@@ -1,5 +1,5 @@
-const members = process.env.SQUAD_GITFLOW_MEMEBERS
-  ? process.env.SQUAD_GITFLOW_MEMEBERS.split(",")
+const members = process.env.SQUAD_GITFLOW_MEMBERS
+  ? process.env.SQUAD_GITFLOW_MEMBERS.split(",")
   : [];
 
 const squads = {

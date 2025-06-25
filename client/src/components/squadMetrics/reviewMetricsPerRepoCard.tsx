@@ -15,7 +15,7 @@ interface ReviewMetrics {
   prsWithReworkCount: number;
 }
 
-interface ReviewMetricsPerRepoCardProps {
+interface ReviewMetricsProps {
   reviewMetricsPerRepo: Record<string, ReviewMetrics>;
 }
 
@@ -46,9 +46,9 @@ const metricsConfig = [
   },
 ];
 
-export default function ReviewMetricsPerRepoCard({
+export default function ReviewMetrics({
   reviewMetricsPerRepo,
-}: ReviewMetricsPerRepoCardProps) {
+}: ReviewMetricsProps) {
   if (!reviewMetricsPerRepo || Object.keys(reviewMetricsPerRepo).length === 0) {
     return null;
   }

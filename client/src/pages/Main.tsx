@@ -1,10 +1,11 @@
-import { useState } from "react";
 import { Navbar } from "@/components/ui/navbar";
 import Dashboard from "../components/Dashboard";
 import AIAssistant from "../components/AIAssistant";
+import { useAppSelector } from "@/store/hooks";
+import { getActivePage } from "@/store/dashboardSlice";
 
 export default function Main() {
-  const [activeTab, setActiveTab] = useState("insights");
+  const activePage = useAppSelector(getActivePage);
 
   const onLogoutHandler = () => {
     localStorage.removeItem("github_username");
@@ -15,12 +16,8 @@ export default function Main() {
 
   return (
     <div className="min-h-screen bg-gray-5">
-      <Navbar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        onLogout={onLogoutHandler}
-      />
-      {activeTab === "insights" ? <Dashboard /> : <AIAssistant />}
+      <Navbar onLogout={onLogoutHandler} />
+      {activePage === "insights" ? <Dashboard /> : <AIAssistant />}
     </div>
   );
 }

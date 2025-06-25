@@ -35,3 +35,23 @@ export interface RepoBreakdown {
   commitsByDay: Record<string, number>;
   commitsPerUser: Record<string, number>;
 }
+
+export interface SquadInsightsResponse {
+  prCycleTimeEntries: PRCycleTime[];
+  commitsPerDay: Record<string, number>;
+  prCountPerRepo: Record<string, number>;
+  reviewMetricsPerRepo: Record<
+    string,
+    {
+      averageReviewCount: number;
+      averageTimeToFirstReview: number;
+      reviewCompletionRate: number;
+      prsWithReworkCount: number;
+    }
+  >;
+  aiInsights: {
+    prCycleTimeInsights: Array<string>;
+    prCountAndCommitsInsights: Array<string>;
+    raw: string;
+  };
+}

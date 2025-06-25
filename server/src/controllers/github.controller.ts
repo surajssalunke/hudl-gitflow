@@ -13,9 +13,10 @@ export async function getPrCycleTimesAndThroughput(
   req: SquadRequest,
   res: Response
 ) {
-  const { from, to } = req.body as {
+  const { from, to, member } = req.body as {
     from?: string;
     to?: string;
+    member?: string;
   };
 
   if (!req.squad || !from) {
@@ -34,7 +35,7 @@ export async function getPrCycleTimesAndThroughput(
     const data = await getCycleTimeForSquadRepos(
       octokit,
       req.owner!,
-      req.members!,
+      member ? [member] : req.members!,
       req.repos,
       from as string,
       to as string

@@ -9,7 +9,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-import type { PRCycleTime } from "@/types/insights";
+import type { PRCycleTime } from "@/types/squadInsights";
 import { getAvgDays } from "@/util/duration";
 
 interface TProps {

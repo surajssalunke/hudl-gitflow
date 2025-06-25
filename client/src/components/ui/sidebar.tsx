@@ -1,26 +1,25 @@
+import {
+  getActivePage,
+  getMember,
+  getRepo,
+  setMember,
+  setRepo,
+} from "@/store/dashboardSlice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import axios from "axios";
 import { useEffect, useState } from "react";
-
-type TProps = {
-  activePage?: "dashboard" | "assistant";
-  selectedMember: string | null;
-  selectedRepo: string | null;
-  setSelectedMember: React.Dispatch<React.SetStateAction<string | null>>;
-  setSelectedRepo: React.Dispatch<React.SetStateAction<string | null>>;
-};
 
 let SERVER_HOST_URL = "http://localhost:8080";
 if (import.meta.env.PROD) {
   SERVER_HOST_URL = "";
 }
 
-export default function Sidebar({
-  activePage = "dashboard",
-  selectedMember,
-  selectedRepo,
-  setSelectedMember,
-  setSelectedRepo,
-}: TProps) {
+export default function Sidebar() {
+  const member = useAppSelector(getMember);
+  const repo = useAppSelector(getRepo);
+  const activePage = useAppSelector(getActivePage);
+  const dispatch = useAppDispatch();
+
   const [squadInfo, setSquadInfo] = useState<{
     squad: string;
     members: string[];
@@ -67,11 +66,11 @@ export default function Sidebar({
               <li
                 key={m}
                 className={`flex items-center gap-2 cursor-pointer rounded px-2 py-1 transition-colors ${
-                  selectedMember === m
+                  member === m
                     ? "bg-blue-100 text-blue-800 font-bold"
                     : "hover:bg-gray-100"
                 }`}
-                onClick={() => setSelectedMember(m)}
+                onClick={() => dispatch(setMember(m))}
               >
                 <span className="inline-block w-2 h-2 bg-green-400 rounded-full"></span>
                 {m}
@@ -89,11 +88,11 @@ export default function Sidebar({
               <li
                 key={r}
                 className={`flex items-center gap-2 cursor-pointer rounded px-2 py-1 transition-colors ${
-                  selectedRepo === r
+                  repo === r
                     ? "bg-blue-100 text-blue-800 font-bold"
                     : "hover:bg-gray-100"
                 }`}
-                onClick={() => setSelectedRepo(r)}
+                onClick={() => dispatch(setRepo(r))}
               >
                 <span className="inline-block w-2 h-2 bg-blue-400 rounded-full"></span>
                 {r}
@@ -102,7 +101,7 @@ export default function Sidebar({
           </ul>
         </div>
         <div className="h-px bg-gray-200 w-full" />
-        {activePage === "assistant" && (
+        {activePage === "ai-assistant" && (
           <div className="flex-1 flex flex-col min-h-0 overflow-y-auto">
             <div className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">
               Workflows
